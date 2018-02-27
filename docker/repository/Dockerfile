@@ -1,4 +1,4 @@
-FROM docker-internal.alfresco.com/full-content-services:latest
+FROM quay.io/alfresco/full-content-services:feature-AUTH-64-token-auth
 
 # Remove Share installed by the ACS image
 # TODO: Remove this once the Repo team update their image
