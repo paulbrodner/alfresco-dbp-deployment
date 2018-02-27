@@ -1,8 +1,8 @@
-FROM quay.io/alfresco/full-content-services:feature-AUTH-64-token-auth
+FROM quay.io/alfresco/alfresco-full-content-services:feature-AUTH-64-token-auth
 
 # Remove Share installed by the ACS image
 # TODO: Remove this once the Repo team update their image
-RUN rm -r /usr/local/tomcat/webapps/share
+# RUN rm -r /usr/local/tomcat/webapps/share
 
 # Add DBP AMPs
 COPY target/amps /usr/local/tomcat/amps
