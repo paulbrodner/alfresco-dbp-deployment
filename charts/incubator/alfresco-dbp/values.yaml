@@ -4,7 +4,7 @@
 replicaCount: 1
 
 alfresco-process-services:
-  enabled: false
+  enabled: true
   resources:
     requests:
       memory: "2000Mi"
@@ -22,27 +22,30 @@ alfresco-content-services:
     enabled: false
   repository:
     image:
-      repository: quay.io/alfresco/alfresco-dbp-repository-auth-poc
-      tag: "0.1-SNAPSHOT"
+      repository: quay.io/alfresco/alfresco-full-content-services
+      tag: "feature-AUTH-64-token-auth"
     environment:
       # The ACTIVEMQ_HOST is the DNS name of the ActiveMQ Broker. If deployed 
       # from the Alfresco ActiveMQ Chart it will be
       # <Infrastructure Release Name>-activemq-broker
       ACTIVEMQ_HOST: "<infrastructure-releasename>-activemq-broker"
+      # FIXME: Port 61616 is hard-coded here, but is configurable elsewhere
       # The SYNC_SERVICE_URI should contain the details of the ingress host and port.
       SYNC_SERVICE_URI: "<ingresscontrollerurl>/syncservice"
-      # FIXME: Port 61616 is hard-coded here, but is configurable elsewhere
+      # The KEYCLOAK_URI should contain the details of the ingress host and port.
+      KEYCLOAK_URI: "<ingresscontrollerurl>/auth"
       JAVA_OPTS: " -Dsolr.base.url=/solr
         -Dsolr.secureComms=none
         -Dindex.subsystem.name=solr6
         -Dauthentication.chain=token1:token,alfrescoNtlm1:alfrescoNtlm
         -Dtoken.authentication.enabled=true
+        -Dkeycloak.auth-server-url=\"$KEYCLOAK_URI\"
         -Ddsync.service.uris=\"$SYNC_SERVICE_URI\"
         -Dmessaging.broker.url=\"failover:(tcp://${ACTIVEMQ_HOST}:61616)?timeout=3000\""
   share:
     image:
-      repository: quay.io/alfresco/alfresco-dbp-share
-      tag: "0.1-SNAPSHOT"
+      repository: quay.io/alfresco/alfresco-full-share
+      tag: "5.2.X"
     resources:
       requests:
         memory: "1000Mi"
