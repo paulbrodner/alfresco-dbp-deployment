@@ -1,4 +1,4 @@
-FROM FROM docker-internal.alfresco.com/full-content-services:latest
+FROM docker-internal.alfresco.com/full-content-services:latest
 
 # Remove Share installed by the ACS image
 # TODO: Remove this once the Repo team update their image
