@@ -1,14 +1,93 @@
 {
 	"info": {
 		"name": "dbp-test",
-		"_postman_id": "2279900f-6eb4-e587-51ee-cfeadb7509c1",
-		"description": "This is to test all the rest api request for validating the dbp services are up and running correctly",
+		"_postman_id": "3998d530-3c21-4990-bf3c-6c2f154fafca",
+		"description": "",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "ACS CASE",
-			"description": "This collection will contain all the necessary test to validate ACS",
+			"name": "01 Token Generator",
+			"description": "",
+			"item": [
+				{
+					"name": "key cloak",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7f98812c-e8cd-4794-8e41-a3b91c959525",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.get(\"url\");",
+									"",
+									"var tokens=JSON.parse(responseBody); ",
+									"postman.setGlobalVariable(\"kcAccessToken\", tokens.access_token); ",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "activiti",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "hruser",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://{{url}}/auth/realms/springboot/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"auth",
+								"realms",
+								"springboot",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						},
+						"description": null
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02 ACS case",
+			"description": "",
 			"item": [
 				{
 					"name": "repo-descovery with amps",
@@ -267,7 +346,8 @@
 								"api",
 								"solrstats"
 							]
-						}
+						},
+						"description": null
 					},
 					"response": []
 				},
@@ -336,18 +416,129 @@
 								"actions",
 								"google-edit-flat-16.png"
 							]
+						},
+						"description": null
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve HR User Profile using token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "79ad559f-7af2-4ab3-a518-ce54f9f82b79",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.get(\"url\");",
+									"",
+									""
+								]
+							}
 						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{kcAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{url}}/alfresco/api/-default-/public/alfresco/versions/1/people/-me-",
+							"protocol": "http",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"alfresco",
+								"api",
+								"-default-",
+								"public",
+								"alfresco",
+								"versions",
+								"1",
+								"people",
+								"-me-"
+							]
+						},
+						"description": null
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve HR User Files using token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ae77e4a0-ba08-426f-a589-0d0817c338dc",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{kcAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{url}}/alfresco/api/-default-/public/alfresco/versions/1/nodes/-my-/children?includeSource=true",
+							"protocol": "http",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"alfresco",
+								"api",
+								"-default-",
+								"public",
+								"alfresco",
+								"versions",
+								"1",
+								"nodes",
+								"-my-",
+								"children"
+							],
+							"query": [
+								{
+									"key": "includeSource",
+									"value": "true",
+									"equals": true
+								}
+							]
+						},
+						"description": null
 					},
 					"response": []
 				}
 			]
 		},
 		{
-			"name": "APS CASE",
+			"name": "03 APS case",
 			"description": "This folder will contain all the cases related to APS",
 			"item": [
 				{
-					"name": "aps",
+					"name": "aps version",
 					"event": [
 						{
 							"listen": "test",
@@ -413,14 +604,141 @@
 								"enterprise",
 								"app-version"
 							]
+						},
+						"description": null
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve HR User profile using token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "ababde1b-5970-43ab-9994-31348d21a19e",
+								"type": "text/javascript",
+								"exec": [
+									"pm.environment.get(\"url\")",
+									"",
+									"pm.environment.get(\"userId\");",
+									"",
+									"",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								]
+							}
 						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{kcAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://{{url}}/activiti-app/api/enterprise/users/{{userId}}",
+							"protocol": "http",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"activiti-app",
+								"api",
+								"enterprise",
+								"users",
+								"{{userId}}"
+							]
+						},
+						"description": null
+					},
+					"response": []
+				},
+				{
+					"name": "Create APS test Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "d4276abf-44f2-4129-bd22-f7bbdbb9846f",
+								"type": "text/javascript",
+								"exec": [
+									"pm.globals.get(\"url\");",
+									"",
+									"var jsonData = pm.response.json().id;",
+									"pm.environment.set(\"userId\", jsonData);",
+									"",
+									"  "
+								]
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "admin",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@app.activiti.com",
+									"type": "string"
+								},
+								{
+									"key": "saveHelperData",
+									"type": "any"
+								},
+								{
+									"key": "showPassword",
+									"value": false,
+									"type": "boolean"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"hruser@activiti.com\",\n    \"firstName\": \"h\",\n    \"lastName\": \"r\",\n    \"password\": \"Password2\",\n    \"type\": \"enterprise\",\n    \"tenantId\": 1\n    }"
+						},
+						"url": {
+							"raw": "http://{{url}}/activiti-app/api/enterprise/admin/users",
+							"protocol": "http",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"activiti-app",
+								"api",
+								"enterprise",
+								"admin",
+								"users"
+							]
+						},
+						"description": null
 					},
 					"response": []
 				}
 			]
 		},
 		{
-			"name": "Sync Service",
+			"name": "04 Sync Service case",
+			"description": null,
 			"item": [
 				{
 					"name": "sync service",
@@ -484,83 +802,12 @@
 								"syncservice",
 								"healthcheck"
 							]
-						}
+						},
+						"description": null
 					},
 					"response": []
 				}
 			]
-		},
-		{
-			"name": "key cloak",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"id": "7f98812c-e8cd-4794-8e41-a3b91c959525",
-						"type": "text/javascript",
-						"exec": [
-							"pm.globals.get(\"url\");",
-							"",
-							"var tokens=JSON.parse(responseBody); ",
-							"postman.setGlobalVariable(\"kcAccessToken\", tokens.access_token); ",
-							"",
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});"
-						]
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/x-www-form-urlencoded"
-					}
-				],
-				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "client_id",
-							"value": "activiti",
-							"type": "text"
-						},
-						{
-							"key": "grant_type",
-							"value": "password",
-							"type": "text"
-						},
-						{
-							"key": "username",
-							"value": "hruser",
-							"type": "text"
-						},
-						{
-							"key": "password",
-							"value": "password",
-							"type": "text"
-						}
-					]
-				},
-				"url": {
-					"raw": "http://{{url}}/auth/realms/springboot/protocol/openid-connect/token",
-					"protocol": "http",
-					"host": [
-						"{{url}}"
-					],
-					"path": [
-						"auth",
-						"realms",
-						"springboot",
-						"protocol",
-						"openid-connect",
-						"token"
-					]
-				}
-			},
-			"response": []
 		},
 		{
 			"name": "auth gateway",
@@ -605,7 +852,8 @@
 						"actuator",
 						"routes"
 					]
-				}
+				},
+				"description": null
 			},
 			"response": []
 		}
