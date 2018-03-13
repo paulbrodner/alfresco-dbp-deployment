@@ -1,14 +1,14 @@
 {
 	"info": {
-		"name": "dbp-test",
-		"_postman_id": "3998d530-3c21-4990-bf3c-6c2f154fafca",
-		"description": "The Suite of cases are divided into 4\ndifferent categories\n1) Acs-basic-auth\n* Request to validate the discovery api\n* Request to validate modules are applied correctly\n2) ACS-token-auth \n* Post to generate the token\n* Request to validate ACS request using token\n* Request to validate CMIS request using token\n* Request to validate vo request using token\n3) APS\n* Request to validate using token\n4) Sync service",
+		"name": "dbp-test copy",
+		"_postman_id": "446364aa-ad19-40e3-9796-a583e03b401b",
+		"description": "The Suite of cases are divided into 6\ndifferent categories\n1) Acs-basic-auth\n* Request to validate the discovery api\n* Request to validate modules are applied correctly\n2) Generate the token \n3) ACS-token-auth \n* Post to generate the token\n* Request to validate ACS request using token\n* Request to validate CMIS request using token\n* Request to validate vo request using token\n4) APS\n* Request to validate using token\n5) Sync service\n6) get way validation",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "01 ACS-basic-auth",
-			"description": "",
+			"description": null,
 			"item": [
 				{
 					"name": "repo-descovery with amps",
@@ -345,7 +345,7 @@
 			]
 		},
 		{
-			"name": "02 ACS-token-auth",
+			"name": "Token-generation",
 			"description": "",
 			"item": [
 				{
@@ -420,7 +420,13 @@
 						"description": null
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "03 ACS-token-auth",
+			"description": null,
+			"item": [
 				{
 					"name": "Retrieve HR User Profile using token",
 					"event": [
@@ -490,28 +496,95 @@
 					"response": []
 				},
 				{
+					"name": "Create Content using HR user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7710e690-3b80-482d-be72-d7fa4e059137",
+								"type": "text/javascript",
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"validateUserName\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    var userName= jsonData.entry.createdByUser.id;",
+									"    pm.expect(userName).to.be.eql(\"hruser\");",
+									"        ",
+									"});"
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{kcAccessToken}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\":\"hrusertestfile.txt\",\n  \"nodeType\":\"cm:content\"\n}"
+						},
+						"url": {
+							"raw": "http://{{url}}/alfresco/api/-default-/public/alfresco/versions/1/nodes/-my-/children",
+							"protocol": "http",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"alfresco",
+								"api",
+								"-default-",
+								"public",
+								"alfresco",
+								"versions",
+								"1",
+								"nodes",
+								"-my-",
+								"children"
+							]
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
 					"name": "Retrieve HR User Files using token",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
-								"id": "630f149c-7d0f-4a64-9266-07f89aef194b",
+								"id": "ac8db113-7bc5-4583-8d2a-8134719547b2",
 								"type": "text/javascript",
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
+									"pm.test(\"Status code is 200\", function() {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"validateid\", function () {",
+									"pm.test(\"validateid\", function() {",
 									"    var jsonData = pm.response.json();",
-									"    var modulesArray= jsonData.list.source.properties;",
-									"      for(var key in modulesArray)",
-									"    {",
+									"    var modulesArray = jsonData.list.source.properties;",
+									"    for (var key in modulesArray) {",
 									"        var obj = modulesArray[key];",
 									"        var id = obj.id;",
 									"        pm.expect(id).to.be.eql(\"hruser\");",
-									"    }   ",
-									"  ",
+									"    }",
+									"",
+									"});",
+									"",
+									"pm.test(\"validateFile\", function() {",
+									"    var jsonData = pm.response.json();",
+									"    var userName = jsonData.list.entries.properties;",
+									"    for (var key in userName) {",
+									"        var obj = modulesArray[key];",
+									"        var id = obj.name;",
+									"        pm.expect(id).to.be.eql(\"hrusertestfile.txt\");",
+									"    }",
 									"});"
 								]
 							}
@@ -689,7 +762,7 @@
 			]
 		},
 		{
-			"name": "03 APS-case",
+			"name": "04 APS-case",
 			"description": "This folder will contain all the cases related to APS",
 			"item": [
 				{
@@ -892,7 +965,7 @@
 			]
 		},
 		{
-			"name": "04 Sync-Service-case",
+			"name": "05 Sync-Service-case",
 			"description": null,
 			"item": [
 				{
