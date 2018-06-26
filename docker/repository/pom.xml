@@ -11,6 +11,7 @@
     <properties>
         <alfresco.rm.repo.version>2.6.0</alfresco.rm.repo.version>
         <alfresco.sync.service.version>2.2-SNAPSHOT</alfresco.sync.service.version>
+        <alfresco.s3connector.version>2.2.0</alfresco.s3connector.version>
     </properties>
 
     <dependencies>
@@ -28,6 +29,13 @@
             <classifier>enterprise</classifier>
             <type>amp</type>
         </dependency>
+       <dependency>
+          <groupId>org.alfresco.integrations</groupId>
+          <artifactId>alfresco-s3-connector</artifactId>
+          <version>${alfresco.s3connector.version}</version>
+          <classifier>enterprise</classifier>
+          <type>amp</type>
+       </dependency>
     </dependencies>
 
     <build>
@@ -45,22 +53,32 @@
                         </goals>
                         <configuration>
                             <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.alfresco.services.sync</groupId>
-                                    <artifactId>alfresco-device-sync-repo</artifactId>
-                                    <version>${alfresco.sync.service.version}</version>
-                                    <type>amp</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/amps</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.alfresco</groupId>
-                                    <artifactId>alfresco-rm-enterprise-repo</artifactId>
-                                    <version>${alfresco.rm.repo.version}</version>
-                                    <type>amp</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/amps</outputDirectory>
-                                </artifactItem>
+<!-- FIXME: commented out due to incompatibility with ACS 6.0
+                              <artifactItem>
+                                  <groupId>org.alfresco.services.sync</groupId>
+                                  <artifactId>alfresco-device-sync-repo</artifactId>
+                                  <version>${alfresco.sync.service.version}</version>
+                                  <type>amp</type>
+                                  <overWrite>false</overWrite>
+                                  <outputDirectory>${project.build.directory}/amps</outputDirectory>
+                               </artifactItem>
+                               <artifactItem>
+                                  <groupId>org.alfresco</groupId>
+                                  <artifactId>alfresco-rm-enterprise-repo</artifactId>
+                                  <version>${alfresco.rm.repo.version}</version>
+                                  <type>amp</type>
+                                  <overWrite>false</overWrite>
+                                  <outputDirectory>${project.build.directory}/amps</outputDirectory>
+                               </artifactItem>
+-->
+                               <artifactItem>
+                                  <groupId>org.alfresco.integrations</groupId>
+                                  <artifactId>alfresco-s3-connector</artifactId>
+                                  <version>${alfresco.s3connector.version}</version>
+                                  <type>amp</type>
+                                  <overWrite>false</overWrite>
+                                  <outputDirectory>${project.build.directory}/amps</outputDirectory>
+                               </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
