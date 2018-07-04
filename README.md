@@ -118,7 +118,7 @@ export ELB_CNAME="YourDesiredCname.YourRoute53DnsZone"
 helm install alfresco-incubator/alfresco-dbp \
 --set alfresco-infrastructure.alfresco-api-gateway.keycloakURL="http://$ELB_CNAME/auth/" \
 --set alfresco-infrastructure.persistence.efs.enabled=true \
---set alfresco-infrastructure.persistence.efs.dns="$ELB_CNAME" \
+--set alfresco-infrastructure.persistence.efs.dns="$NFSSERVER" \
 --set alfresco-content-services.externalHost="$ELB_CNAME" \
 --set alfresco-content-services.networkpolicysetting.enabled=false \
 --set alfresco-content-services.repository.environment.IDENTITY_SERVICE_URI="http://$ELB_CNAME/auth" \
@@ -158,6 +158,7 @@ echo $ELBADDRESS
 
 * Go to **AWS Management Console** and open the **Route 53** console.
 * Click **Hosted Zones** in the left navigation panel, then **Create Record Set**.
+* In **Alias** tick checkbox "Yes"
 * In the **Name** field, enter your "`$ELB_CNAME`" defined in step 4.
 * In the **Alias Target**, select your ELB address ("`$ELBADDRESS`").
 * Click **Create**.
