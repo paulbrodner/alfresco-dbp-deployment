@@ -1,4 +1,4 @@
-FROM quay.io/alfresco/alfresco-content-repository:6.0.0-RC6
+FROM quay.io/alfresco/alfresco-content-repository:6.0.0
 
 # Add DBP AMPs
 COPY target/amps /usr/local/tomcat/amps

@@ -23,6 +23,10 @@ alfresco-content-services:
 #    image:
 #      repository: quay.io/alfresco/alfresco-dbp-repository
 #      tag: "0.3-SNAPSHOT"
+    # Re-introduced in DEPLOY-446 until there is an official Docker image with ACS + S3 Connector
+    image:
+      repository: quay.io/alfresco/alfresco-dbp-repository
+      tag: "0.4-SNAPSHOT-deploy446"
     environment:
       # The ACTIVEMQ_HOST is the DNS name of the ActiveMQ Broker. If deployed 
       # from the Alfresco ActiveMQ Chart it will be
@@ -46,7 +50,11 @@ alfresco-content-services:
         -Didentity-service.authentication.validation.failure.silent=false
         -Didentity-service.auth-server-url=\"$IDENTITY_SERVICE_URI\"
         -Didentity-service.realm=alfresco
-        -Didentity-service.resource=alfresco"
+        -Didentity-service.resource=alfresco
+        -Ds3.bucketName=\"$S3_CONNECTOR_BUCKET_NAME\"
+        -Ds3.bucketLocation=\"$S3_CONNECTOR_BUCKET_LOCATION\"
+        -Ds3.accessKey=\"$accessKey\"
+        -Ds3.secretKey=\"$secretKey\""
   share:
 # DEPLOY-466 / DEPLOY-467 - Remove image pin as we are using the ACS provided images
 #    image:
