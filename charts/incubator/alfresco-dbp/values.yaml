@@ -243,3 +243,5 @@ infrastructure:
     enabled: false
 activiti-cloud-modeling:
   enabled: true
+acs-events-consolidator:
+  enabled: true
