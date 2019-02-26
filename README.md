@@ -22,9 +22,13 @@ Resource requirements for AWS:
 ### Helm Tiller
 
 Initialize the Helm Tiller:
+
 ```bash
 helm init
+kubectl create clusterrolebinding tiller-clusterrole-binding --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 ```
+
+*Note:* This setup will deploy the helm server component and will give helm access to the whole cluster. For a more secure, customized setup, please read -> https://helm.sh/docs/using_helm/#role-based-access-control
 
 ### K8s Cluster Namespace
 
@@ -98,23 +102,30 @@ We don't advise you to use the same EFS instance for persisting the data from mu
 
 ### 2. Add the Alfresco Helm repository to helm
 
-```helm repo add alfresco-incubator https://kubernetes-charts.alfresco.com/incubator```
+```helm repo add alfresco-incubator https://kubernetes-charts.alfresco.com/incubator
+helm repo add alfresco-stable https://kubernetes-charts.alfresco.com/stable
+```
 
-### 3. Configure Route53 entry
+### 3. Configure domain in your values file
 
+Pull the values file from the current repo:
+
+```bash
+curl -O https://raw.githubusercontent.com/Alfresco/alfresco-dbp-deployment/master/charts/incubator/alfresco-dbp/values.yaml
+```
+
+Open it in your favorite text editor and replace all occurences of REPLACEME with your domain.
+
+***Note!***
+Please create a wildcard domain for external-dns (eg. “*.DOMAIN”) as explained [here](https://github.com/Alfresco/alfresco-infrastructure-deployment#nginx-ingress-custom-configuration)
 
 ### 4. Deploy the DBP
 
 ```bash
-# Remember to use https here if you have a trusted certificate set on the ingress
-helm install alfresco-incubator/alfresco-dbp \
+# From within the same folder as your values file
+helm install alfresco-incubator/alfresco-dbp -f values.yaml \
 --set alfresco-infrastructure.persistence.efs.enabled=true \
 --set alfresco-infrastructure.persistence.efs.dns="$NFSSERVER" \
---set alfresco-infrastructure.alfresco-identity-service.client.alfresco.redirectUris=['\"'http://$ELB_CNAME*'"\'] \
---set alfresco-content-services.externalHost="$ELB_CNAME" \
---set alfresco-content-services.networkpolicysetting.enabled=false \
---set alfresco-content-services.repository.environment.IDENTITY_SERVICE_URI="http://$ELB_CNAME/auth" \
---set alfresco-process-services.processEngine.environment.IDENTITY_SERVICE_AUTH="http://$ELB_CNAME/auth" \
 --namespace=$DESIREDNAMESPACE
 ```
 
@@ -124,7 +135,7 @@ By default the dbp chart will deploy fully.
 To disable specific components you can set the following values to false when deploying:
 ```
 alfresco-content-services.enabled
-alfresco-process-services.enabled
+activiti-cloud-full-example.enabled
 alfresco-sync-service.enabled
 alfresco-infrastructure.nginx-ingress.enabled
 ```
@@ -141,32 +152,9 @@ If you are using `https` you should include the following setting in your helm i
 
 If you want to include multiple uris for alfresco client redirect uris check this [guide](https://github.com/Alfresco/alfresco-identity-service#changing-alfresco-client-redirecturis).
 
-### 5. Get the DBP release name from the previous command and set it as a variable:
+### 5. Checkout the status of your DBP deployment:
 
-```bash
-export DBPRELEASE=littering-lizzard
-```
-
-### 6. Get ELB IP and copy it for linking the ELB in AWS Route53:
-
-```bash
-export ELBADDRESS=$(kubectl get services $DBPRELEASE-nginx-ingress-controller --namespace=$DESIREDNAMESPACE -o jsonpath={.status.loadBalancer.ingress[0].hostname})
-echo $ELBADDRESS
-```
-
-### 7. Create a Route 53 Record Set in your Hosted Zone
-
-* Go to **AWS Management Console** and open the **Route 53** console.
-* Click **Hosted Zones** in the left navigation panel, then **Create Record Set**.
-* In the **Name** field, enter your "`$ELB_CNAME`" defined in step 4.
-* In the **Alias Target**, select your ELB address ("`$ELBADDRESS`").
-* Click **Create**.
-
-You may need to wait a couple of minutes before the record set propagates around the world.
-
-### 8. Checkout the status of your DBP deployment:
-
-*Note:* When checking status, your pods should be ```READY 1/1```
+*Note:* When checking status, your pods should be ```READY x/x```
 
 ```bash
 helm status $DBPRELEASE
@@ -232,7 +220,10 @@ brew update; brew install kubernetes-helm
 
 ```bash
 helm init
+kubectl create clusterrolebinding tiller-clusterrole-binding --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 ```
+
+*Note:* This setup will deploy the helm server component and will give helm access to the whole cluster. For a more secure, customized setup, please read -> https://helm.sh/docs/using_helm/#role-based-access-control
 
 ### 7. Add the Alfresco Incubator Helm Repository
 
@@ -257,15 +248,17 @@ See the Anaxes Shipyard documentation on [secrets](https://github.com/Alfresco/a
 
 *Note*: You can reuse the secrets.yaml file from charts/incubator directory.  
 
-### 10. Download and modify the minimal-values file
+### 10. Download and modify the minimal-values.yaml file
 
-Pull the minimal values file from this repo:
+The minimal-values.yaml file contains values for local only development and multiple components are disabled with the purpose of reducing the memory footprint of the Digital Business Platform. This should not be used as a starting point for production use.
+
+Pull the minimal values file from the current repo:
 
 ```bash
 curl -O https://raw.githubusercontent.com/Alfresco/alfresco-dbp-deployment/master/charts/incubator/alfresco-dbp/minimal-values.yaml
 ```
 
-Open it in your favorite text editor and replace all occurences of REPLACEME with the IP you previously got from step 8
+Open it in your favorite text editor and replace all occurences of REPLACEME with the IP you previously got from step 8.
 
 ### 11. Deploy the dbp
 
@@ -314,7 +307,7 @@ We would recommend using this command over installing the kubernetes cli which m
 
 If you are deploying multiple projects in your Docker for Desktop Kuberenetes Cluster you may find it useful to use namespaces to segment the projects.
 
-To create a namespace
+To create a namespace:
 ```bash
 export DESIREDNAMESPACE=example
 kubectl create namespace $DESIREDNAMESPACE
