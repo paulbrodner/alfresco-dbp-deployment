@@ -16,7 +16,9 @@ pipeline {
   stages {
     stage('Namespace') {
       steps {
-        sh "make update-kubeconfig"        
+        dir(".jenkins") {
+          sh "make update-kubeconfig"        
+        }
       }
     }
   }
