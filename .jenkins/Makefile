@@ -37,7 +37,8 @@ help: ## showing this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 update-kubeconfig:
-	aws eks update-kubeconfig --name=tcds-1 --region=eu-west-3
+	@aws eks update-kubeconfig --name=tcds-1 --region=eu-west-3
+	@kubectl get ns
 
 namespace: ## 1 - create namespace for your cluster	
 	@kubectl create namespace $(DESIREDNAMESPACE)	
