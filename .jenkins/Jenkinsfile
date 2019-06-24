@@ -1,0 +1,22 @@
+pipeline {
+  agent {
+    label "dbp"
+  }
+
+  options {        
+    ansiColor('xterm')
+  }
+
+  environment { 
+    DESIREDNAMESPACE = "branch-build-number"
+    DNSZONE          = "${DESIREDNAMESPACE}.dev.alfresco.me"
+  }
+
+  stages {
+    stage('Namespace') {
+      steps {
+        sh "env"        
+      }
+    }
+  }
+}

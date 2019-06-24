@@ -1,0 +1,28 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+    name: tcds-1
+    region: eu-west-3
+
+# cluster AZs must be set explicitly for single AZ nodegroup example to work
+availabilityZones: ["eu-west-3a", "eu-west-3b", "eu-west-3c"]
+
+nodeGroups:
+    - name: ng-1
+      minSize: 3
+      availabilityZones: ["eu-west-3a","eu-west-3b","eu-west-3c"]
+      labels:
+        nodegroup-type: "k8sWorkers"
+        team: "TCDS"
+      iam:
+        withAddonPolicies:
+          autoScaler: true
+          imageBuilder: true
+      maxSize: 6
+      instancesDistribution:
+        maxPrice: 0.25
+        instanceTypes: ["m5.xlarge","m4.xlarge"]
+        onDemandBaseCapacity: 0
+        onDemandPercentageAboveBaseCapacity: 0
+        spotInstancePools: 2
