@@ -16,7 +16,7 @@ pipeline {
   stages {
     stage('Namespace') {
       steps {
-        sh "echo ${DNSZONE}"        
+        sh "make update-kubeconfig"        
       }
     }
   }
