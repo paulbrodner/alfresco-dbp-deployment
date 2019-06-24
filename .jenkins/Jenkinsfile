@@ -8,7 +8,7 @@ pipeline {
   }
 
   environment { 
-    DESIREDNAMESPACE = "`${env.GIT_BRANCH}| sed 's/\//_/'`-${env.BUILD_NUMBER}"
+    DESIREDNAMESPACE = "`echo ${env.GIT_BRANCH}|sed 's/\//_/'`-${env.BUILD_NUMBER}"
     DNSZONE          = "${DESIREDNAMESPACE}.dev.alfresco.me"
   }
 
