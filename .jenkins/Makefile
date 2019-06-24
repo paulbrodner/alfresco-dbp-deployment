@@ -36,7 +36,10 @@ endif
 help: ## showing this help message 	
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-namespace: ## 1 - create namespace for your cluster
+update-kubeconfig:
+	aws eks update-kubeconfig --name=tcds-1 --region=eu-west-3
+
+namespace: ## 1 - create namespace for your cluster	
 	@kubectl create namespace $(DESIREDNAMESPACE)	
 	helm repo add alfresco-incubator https://kubernetes-charts.alfresco.com/incubator
 	helm repo add alfresco-stable https://kubernetes-charts.alfresco.com/stable
