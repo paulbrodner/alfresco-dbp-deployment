@@ -7,15 +7,16 @@ pipeline {
     ansiColor('xterm')
   }
 
-  environment { 
-    DESIREDNAMESPACE = "`echo ${env.GIT_BRANCH}|sed 's/\//_/'`-${env.BUILD_NUMBER}"
+  environment {
+    BRANCH_NAME      = `echo ${env.GIT_BRANCH}|sed 's/\\\\//_/'`
+    DESIREDNAMESPACE = "${BRANCH_NAME}-${env.BUILD_NUMBER}"
     DNSZONE          = "${DESIREDNAMESPACE}.dev.alfresco.me"
   }
 
   stages {
     stage('Namespace') {
       steps {
-        sh "env"        
+        sh "echo ${DNSZONE}"        
       }
     }
   }
