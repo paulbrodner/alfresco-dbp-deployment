@@ -8,7 +8,7 @@ pipeline {
   }
 
   environment { 
-    DESIREDNAMESPACE = "branch-build-number"
+    DESIREDNAMESPACE = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
     DNSZONE          = "${DESIREDNAMESPACE}.dev.alfresco.me"
   }
 
