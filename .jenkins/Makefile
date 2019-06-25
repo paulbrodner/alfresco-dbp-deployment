@@ -37,6 +37,7 @@ help: ## showing this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 update-kubeconfig:
+	@helm init --upgrade
 	@aws eks update-kubeconfig --name=tcds-1 --region=eu-west-3
 	@kubectl get ns
 
@@ -85,10 +86,10 @@ get-ingress: get-dbp-deployment-name ## display Load Balancer IP
 	@echo The Ingress Load Balancer is found at: $(LOAD_BALANCER_IP)
 
 create-route: get-ingress
-	$(shell .scripts/route53-sh --create $(DNSZONE) $(LOAD_BALANCER_IP))
+	$(shell .scripts/route53.sh --create $(DNSZONE) $(LOAD_BALANCER_IP))
 
 delete-route: get-ingress
-	$(shell .scripts/route53-sh --delete $(DNSZONE) $(LOAD_BALANCER_IP))
+	$(shell .scripts/route53.sh --delete $(DNSZONE) $(LOAD_BALANCER_IP))
 
 build: update-kubeconfig namespace deploy create-route	## all in one - create
 cleanup: delete-route destroy ## all in one - destroy
