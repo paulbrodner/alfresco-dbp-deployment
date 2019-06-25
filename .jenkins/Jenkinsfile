@@ -17,7 +17,7 @@ pipeline {
     stage('Deploy') {
       steps {
         dir(".jenkins") {
-          configFileProvider([configFile(fileId: 'cluster-secrets', variable: 'SECRETS_YAML')]) {
+          configFileProvider([configFile(fileId: 'secrets.yml', variable: 'SECRETS_YAML')]) {
             sh "make build"
           }          
         }
