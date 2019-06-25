@@ -36,16 +36,18 @@ endif
 help: ## showing this help message 	
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-update-kubeconfig:
+# only on Jenkins server run this
+ifdef JENKINS_HOME
 	@helm init --upgrade
 	@aws eks update-kubeconfig --name=tcds-1 --region=eu-west-3
-	@kubectl get ns
+	kubectl get ns
+endif
 
 namespace: ## 1 - create namespace for your cluster	
 	@kubectl create namespace $(DESIREDNAMESPACE)	
 	helm repo add alfresco-incubator https://kubernetes-charts.alfresco.com/incubator
 	helm repo add alfresco-stable https://kubernetes-charts.alfresco.com/stable
-	kubectl create -f $(SECRETS_YAML) --namespace $(DESIREDNAMESPACE)
+	@kubectl create -f $(SECRETS_YAML) --namespace $(DESIREDNAMESPACE)
 
 deploy: sed-values ## 2 - deploy	
 	# details https://github.com/helm/charts/tree/master/stable/nfs-server-provisioner
@@ -59,7 +61,7 @@ deploy: sed-values ## 2 - deploy
 	
 destroy: ## cleanup after deploy
 	@kubectl delete --all pods --force --grace-period=0 --namespace=$(DESIREDNAMESPACE) && \
-	@sleep 10 && \
+	sleep 10
 	@kubectl delete --all pods --force --grace-period=0 --namespace=$(DESIREDNAMESPACE) && \
 	helm delete --purge `helm ls --namespace=$(DESIREDNAMESPACE) | grep $(DESIREDNAMESPACE) | awk {'print $$1'}` && \
 	kubectl delete ns $(DESIREDNAMESPACE)
@@ -70,7 +72,7 @@ proxy: ## open k8s dashboard
 	$(OPEN)  http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/		
 	@make get-proxy-token
 
-get-proxy-token: ## get toke for login on k8s dashboard
+get-proxy-token: ## get token for login on k8s dashboard
 	@$(eval K8S_DASHBOARD_TOKEN := $(shell kubectl -n kube-system get secrets | grep kubernetes-dashboard-token | awk '{print $$1}'))
 	@kubectl -n kube-system describe secrets $(K8S_DASHBOARD_TOKEN)	
 
@@ -81,15 +83,17 @@ sed-values:
 get-dbp-deployment-name:
 	$(eval DBP_DEPLOYMENT_NAME := "$(shell helm ls --namespace $(DESIREDNAMESPACE) | grep alfresco-dbp | awk '{printf $$1}')-nginx-ingress-controller")	
 
-get-ingress: get-dbp-deployment-name ## display Load Balancer IP	
+get-ingress: get-dbp-deployment-name ## get load balancer IP	
 	$(eval LOAD_BALANCER_IP := $(shell kubectl --namespace $(DESIREDNAMESPACE) get services $(DBP_DEPLOYMENT_NAME) -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'))
 	@echo The Ingress Load Balancer is found at: $(LOAD_BALANCER_IP)
 
 create-route: get-ingress
-	$(shell .scripts/route53.sh --create $(DNSZONE) $(LOAD_BALANCER_IP))
+	$(shell .scripts/route53.sh --create *.$(DNSZONE) $(LOAD_BALANCER_IP))
 
 delete-route: get-ingress
-	$(shell .scripts/route53.sh --delete $(DNSZONE) $(LOAD_BALANCER_IP))
+	$(shell .scripts/route53.sh --delete *.$(DNSZONE) $(LOAD_BALANCER_IP))
 
-build: update-kubeconfig namespace deploy create-route	## all in one - create
+build: namespace deploy	## all in one - create
+	sleep 30 && make create-route
+	
 cleanup: delete-route destroy ## all in one - destroy
