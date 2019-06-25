@@ -8,8 +8,8 @@ pipeline {
   }
 
   environment {
-    BRANCH_NAME      = "`echo ${env.GIT_BRANCH}|sed 's/\\\\//_/'`"
-    DESIREDNAMESPACE = "${BRANCH_NAME}-${env.BUILD_NUMBER}"
+    BRANCH_NAME      = "`echo ${env.GIT_BRANCH}|sed 's/\\\\//-/'`"
+    DESIREDNAMESPACE = "${env.BUILD_NUMBER}-${BRANCH_NAME}"
     DNSZONE          = "${DESIREDNAMESPACE}.dev.alfresco.me"
   }
 
@@ -17,7 +17,7 @@ pipeline {
     stage('Deploy') {
       steps {
         dir(".jenkins") {
-          configFileProvider([configFile(fileId: 'cluster-secrets', variable: 'SECRETS_YAML')]) {
+          configFileProvider([configFile(fileId: 'secrets.yml', variable: 'SECRETS_YAML')]) {
             sh "make build"
           }          
         }
