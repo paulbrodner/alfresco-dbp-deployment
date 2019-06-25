@@ -14,19 +14,14 @@ pipeline {
   }
 
   stages {
-    stage('Namespace') {
-      steps {
-        dir(".jenkins") {
-          sh "make update-kubeconfig namespace"
-        }
-      }
-    }
     stage('Deploy') {
       steps {
         dir(".jenkins") {
-          sh "make deploy"
+          configFileProvider([configFile(fileId: 'cluster-secrets', variable: 'SECRETS_YAML')]) {
+            sh "make build"
+          }          
         }
       }
-    }
+    }   
   }
 }

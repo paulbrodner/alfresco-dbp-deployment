@@ -55,7 +55,7 @@ deploy: sed-values ## 2 - deploy
 		--set alfresco-infrastructure.persistence.storageClass.enabled=true \
 		--set alfresco-infrastructure.persistence.storageClass.name=$(DESIREDNAMESPACE) \
 		--namespace=$(DESIREDNAMESPACE)
-
+	
 destroy: ## cleanup after deploy
 	@kubectl delete --all pods --force --grace-period=0 --namespace=$(DESIREDNAMESPACE) && \
 	@sleep 10 && \
@@ -77,10 +77,18 @@ sed-values:
 	@sed -i -e "s/https:/http:/" $(CHART_VALUES)
 	@sed -i -e "s/REPLACEME/$(DNSZONE)/" $(CHART_VALUES)
 	
+get-dbp-deployment-name:
+	$(eval DBP_DEPLOYMENT_NAME := "$(shell helm ls --namespace $(DESIREDNAMESPACE) | grep alfresco-dbp | awk '{printf $$1}')-nginx-ingress-controller")	
 
 get-ingress: get-dbp-deployment-name ## display Load Balancer IP	
 	$(eval LOAD_BALANCER_IP := $(shell kubectl --namespace $(DESIREDNAMESPACE) get services $(DBP_DEPLOYMENT_NAME) -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'))
 	@echo The Ingress Load Balancer is found at: $(LOAD_BALANCER_IP)
 
-get-dbp-deployment-name:
-	$(eval DBP_DEPLOYMENT_NAME := "$(shell helm ls --namespace $(DESIREDNAMESPACE) | grep alfresco-dbp | awk '{printf $$1}')-nginx-ingress-controller")	
+create-route: get-ingress
+	$(shell .scripts/route53-sh --create $(DNSZONE) $(LOAD_BALANCER_IP))
+
+delete-route: get-ingress
+	$(shell .scripts/route53-sh --delete $(DNSZONE) $(LOAD_BALANCER_IP))
+
+build: update-kubeconfig namespace deploy create-route	## all in one - create
+cleanup: delete-route destroy ## all in one - destroy
