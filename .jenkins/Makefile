@@ -83,10 +83,10 @@ sed-values:
 	@sed -i -e "s/REPLACEME/$(DNSZONE)/" $(CHART_VALUES)
 	
 get-dbp-deployment-name:
+	#sleep 60
 	$(eval DBP_DEPLOYMENT_NAME := "$(shell helm ls --namespace $(DESIREDNAMESPACE) | grep alfresco-dbp | awk '{printf $$1}')-nginx-ingress-controller")	
 
-get-ingress: get-dbp-deployment-name ## get load balancer IP	
-	sleep 60
+get-ingress: get-dbp-deployment-name ## get load balancer IP		
 	$(eval LOAD_BALANCER_IP := $(shell kubectl --namespace $(DESIREDNAMESPACE) get services $(DBP_DEPLOYMENT_NAME) -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'))
 	@echo The Ingress Load Balancer is found at: $(LOAD_BALANCER_IP)
 
