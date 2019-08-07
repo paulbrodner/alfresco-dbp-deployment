@@ -46,20 +46,24 @@ route_template() {
   local route_dns_name=${2:-'development'}
   local route_ip_address=${3:-'not-set'}
 
-  cat <<EOF >> ${dir}/route-53.json
+  cat <<EOF > ${dir}/route-53.json
 {
-  "Comment":"CNAME for my Deployment",
-  "Changes":[{
-    "Action": "${action}",
-    "ResourceRecordSet":{
-      "Name": "${route_dns_name}",
-      "Type":"CNAME",
-      "TTL":30, 
-      "ResourceRecords":[{
-        "Value": "${route_ip_address}"
-      }]
+  "Comment": "CNAME for my Deployment",
+  "Changes": [
+    {
+      "Action": "${action}",
+      "ResourceRecordSet": {
+        "Name": "${route_dns_name}",
+        "Type": "CNAME",
+        "TTL": 30,
+        "ResourceRecords": [
+          {
+            "Value": "${route_ip_address}"
+          }
+        ]
+      }
     }
-  }]
+  ]
 }
 EOF
 }
@@ -67,11 +71,8 @@ EOF
 
 if [ "$CREATE" = "true" ]; then  
   route_template 'CREATE' $@  
-fi
-if [ "$DELETE" = "true" ]; then
+elif [ "$DELETE" = "true" ]; then
   route_template 'DELETE' $@
 fi
 
-aws route53 change-resource-record-sets  --hosted-zone-id Z15IEG419TWNPC --change-batch file://${dir}/route-53.json
-rm file://${dir}/route-53.json
-sleep 10
+$(aws route53 change-resource-record-sets --hosted-zone-id Z15IEG419TWNPC --change-batch file://$dir/route-53.json) ||  exit 0;
