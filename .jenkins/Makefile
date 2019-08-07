@@ -60,8 +60,7 @@ deploy: sed-values ## 2 - deploy
 	
 destroy: ## cleanup after deploy
 	@kubectl delete --all pods --force --grace-period=0 --namespace=$(DESIREDNAMESPACE) && \
-	sleep 10
-	@kubectl delete --all pods --force --grace-period=0 --namespace=$(DESIREDNAMESPACE) && \
+	sleep 10	
 	helm delete --purge `helm ls --namespace=$(DESIREDNAMESPACE) | grep $(DESIREDNAMESPACE) | awk {'print $$1'}`
 	#kubectl delete ns $(DESIREDNAMESPACE)
 	# force delete of the namespace
