@@ -13,9 +13,17 @@ pipeline {
     DESIREDNAMESPACE        = "${env.BUILD_NUMBER}-${env.BRANCH_NAME}"
     DNSZONE                 = "${DESIREDNAMESPACE}.dev.alfresco.me"
   }
-  
+
   stages {
-    stage('Deploy') {
+    stage('Prepare Agent') {
+      steps {
+        dir(".jenkins") {
+          sh "make agent"
+        }        
+      }
+    }
+
+    stage('Build') {
       steps {
         dir(".jenkins") {
           configFileProvider([configFile(fileId: 'secrets.yml', variable: 'SECRETS_YAML')]) {

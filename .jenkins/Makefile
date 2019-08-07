@@ -37,11 +37,10 @@ help: ## showing this help message
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 # only on Jenkins agents execute this (notice that this variable is set in Jenkinsfile)
-ifdef BRANCH_NAME	
+agent:
 	aws eks update-kubeconfig --name=tcds-1 --region=eu-west-3
-	#helm init --upgrade
+	helm init	
 	kubectl get ns
-endif
 
 namespace: ## 1 - create namespace for your cluster	
 	@kubectl create namespace $(DESIREDNAMESPACE)	
