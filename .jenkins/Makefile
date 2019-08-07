@@ -36,10 +36,10 @@ endif
 help: ## showing this help message 	
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-# only on Jenkins server run this
-ifdef JENKINS_HOME
-	@helm init --upgrade
-	@aws eks update-kubeconfig --name=tcds-1 --region=eu-west-3
+# only on Jenkins agents execute this (notice that this variable is set in Jenkinsfile)
+ifdef BRANCH_NAME	
+	aws eks update-kubeconfig --name=tcds-1 --region=eu-west-3
+	helm init --upgrade
 	kubectl get ns
 endif
 
