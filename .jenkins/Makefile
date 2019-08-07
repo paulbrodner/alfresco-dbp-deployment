@@ -14,12 +14,12 @@ endif
 
 # this should be the branch name or CI build number
 ifndef DESIREDNAMESPACE
-	DESIREDNAMESPACE:=development
+	DESIREDNAMESPACE:=dev-$(shell whoami)
 endif
 
 # the Route53 entry
 ifndef DNSZONE
-	DNSZONE="$(shell whoami).dev.alfresco.me"
+	DNSZONE=$(shell whoami).dev.alfresco.me
 endif
 
 # for development purposes you need to have this secrets.yml file locally created
@@ -88,10 +88,10 @@ get-ingress: get-dbp-deployment-name ## get load balancer IP
 	@echo The Ingress Load Balancer is found at: $(LOAD_BALANCER_IP)
 
 create-route: get-ingress
-	$(shell .scripts/route53.sh --create *.$(DNSZONE) $(LOAD_BALANCER_IP))
+	$(shell .scripts/route53.sh --create '*.$(DNSZONE)' $(LOAD_BALANCER_IP))
 
 delete-route: get-ingress
-	$(shell .scripts/route53.sh --delete *.$(DNSZONE) $(LOAD_BALANCER_IP))
+	$(shell .scripts/route53.sh --delete '*.$(DNSZONE)' $(LOAD_BALANCER_IP))
 
 build: namespace deploy	## all in one - create
 	sleep 30 && make create-route

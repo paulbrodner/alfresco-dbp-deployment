@@ -1,0 +1,25 @@
+export KOPS_STATE_STORE:=s3://pbrodner
+
+.DEFAULT_GOAL := help
+
+help:
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+ifeq ($(UNAME), Linux)
+	OPEN := xdg-open
+endif
+
+ifeq ($(UNAME), Darwin)
+	OPEN := open
+endif
+
+proxy: ## open k8s cluster
+	@kubectl proxy &
+	@echo Opening K8S Dashboard localy via proxy, click Skip on login page! 	
+	$(OPEN) http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/overview?namespace=default
+
+
+.PHONY: get-token
+get-token: ## get token to login
+	$(eval SECRET_NAME := $(shell kubectl --namespace kube-system get secret | grep tiller-sa | awk '{print $$1}'))	
+	kubectl --namespace kube-system describe secret $(SECRET_NAME)

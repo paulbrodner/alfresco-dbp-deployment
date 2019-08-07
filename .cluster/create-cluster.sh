@@ -8,6 +8,8 @@ eksctl get cluster --name=tcds-1 --region=eu-west-3
 
 # update the config so you can access it with kubectl
 aws eks update-kubeconfig --name=tcds-1 --region=eu-west-3
+
+kubectl config current-context
 kubectl get nodes
 
 # create roles and services for access

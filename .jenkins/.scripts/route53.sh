@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+dir=$(pwd)
+
 usage() {
   echo -e "Create/Delete Route53 entries"  
   echo -e "\nUsage:\n$  $0 <action>\n"    
@@ -37,6 +39,7 @@ else
   done
 fi  
 
+set -x
 # route_template 'CREATE' 'development' 127.0.0.1
 route_template() {
   local action=${1:-'CREATE'}
@@ -57,7 +60,7 @@ route_template() {
     }
   }]
 }
-" > route-53.json
+" > ${dir}/route-53.json
 }
 
 
@@ -68,5 +71,5 @@ if [ "$DELETE" = "true" ]; then
   route_template 'DELETE' $@
 fi
 
-aws route53 change-resource-record-sets  --hosted-zone-id Z15IEG419TWNPC --change-batch file://route-53.json
+aws route53 change-resource-record-sets  --hosted-zone-id Z15IEG419TWNPC --change-batch file://${dir}/route-53.json
 sleep 10
