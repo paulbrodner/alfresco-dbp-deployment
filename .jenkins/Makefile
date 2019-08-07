@@ -64,7 +64,11 @@ destroy: ## cleanup after deploy
 	sleep 10
 	@kubectl delete --all pods --force --grace-period=0 --namespace=$(DESIREDNAMESPACE) && \
 	helm delete --purge `helm ls --namespace=$(DESIREDNAMESPACE) | grep $(DESIREDNAMESPACE) | awk {'print $$1'}` && \
-	kubectl delete ns $(DESIREDNAMESPACE)
+	kubectl delete ns $(DESIREDNAMESPACE)	
+
+force-destroy:
+	kubectl get namespace $(DESIREDNAMESPACE) -o json |jq '.spec = {"finalizers":[]}' >temp.json
+	curl -k -H "Content-Type: application/json" -X PUT --data-binary @temp.json 127.0.0.1:8001/api/v1/namespaces/$(DESIREDNAMESPACE)/finalize	
 
 proxy: ## open k8s dashboard
 	@kubectl proxy &
