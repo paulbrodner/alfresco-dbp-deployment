@@ -13,6 +13,7 @@ pipeline {
     DESIREDNAMESPACE        = "${env.BUILD_NUMBER}-${env.BRANCH_NAME}"
     DNSZONE                 = "${DESIREDNAMESPACE}.dev.alfresco.me"
   }
+  
   stages {
     stage('Deploy') {
       steps {
@@ -24,4 +25,15 @@ pipeline {
       }
     }   
   }
+  post {
+      always {
+        timeout(time: 2, unit: "HOURS") {
+          input(message: 'Destroy deployment?', ok: 'Yes')
+          dir(".jenkins") {
+            sh "make destroy"
+          }
+        }
+      }      
+  }
+
 }
