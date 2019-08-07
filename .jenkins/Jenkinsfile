@@ -9,9 +9,8 @@ pipeline {
 
   environment {
     AWS_ACCESS_KEY_ID       = credentials('dbp-user')
-    AWS_SECRET_ACCESS_KEY   = credentials('dbp-user')
-    BRANCH_NAME             = "`echo ${env.GIT_BRANCH}|sed 's/\\\\//-/'`"
-    DESIREDNAMESPACE        = "${env.BUILD_NUMBER}-${BRANCH_NAME}"
+    AWS_SECRET_ACCESS_KEY   = credentials('dbp-user')    
+    DESIREDNAMESPACE        = "${env.BUILD_NUMBER}-${env.BRANCH_NAME}"
     DNSZONE                 = "${DESIREDNAMESPACE}.dev.alfresco.me"
   }
   stages {
