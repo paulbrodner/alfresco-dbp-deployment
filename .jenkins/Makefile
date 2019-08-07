@@ -62,10 +62,10 @@ destroy: ## cleanup after deploy
 	@kubectl delete --all pods --force --grace-period=0 --namespace=$(DESIREDNAMESPACE) && \
 	sleep 10
 	@kubectl delete --all pods --force --grace-period=0 --namespace=$(DESIREDNAMESPACE) && \
-	helm delete --purge `helm ls --namespace=$(DESIREDNAMESPACE) | grep $(DESIREDNAMESPACE) | awk {'print $$1'}` && \
+	helm delete --purge `helm ls --namespace=$(DESIREDNAMESPACE) | grep $(DESIREDNAMESPACE) | awk {'print $$1'}`
 	kubectl delete ns $(DESIREDNAMESPACE)	
 
-force-destroy:
+force-destroy: ## force destruction of DESIREDNAMESPACE
 	kubectl get namespace $(DESIREDNAMESPACE) -o json |jq '.spec = {"finalizers":[]}' >temp.json
 	curl -k -H "Content-Type: application/json" -X PUT --data-binary @temp.json 127.0.0.1:8001/api/v1/namespaces/$(DESIREDNAMESPACE)/finalize	
 
@@ -91,8 +91,7 @@ get-ingress: get-dbp-deployment-name ## get load balancer IP
 	@echo The Ingress Load Balancer is found at: $(LOAD_BALANCER_IP)
 
 create-route: get-ingress
-	sleep 30
-	$(shell .scripts/route53.sh --create '*.$(DNSZONE)' $(LOAD_BALANCER_IP))
+	sleep 60 && $(shell .scripts/route53.sh --create '*.$(DNSZONE)' $(LOAD_BALANCER_IP))
 
 delete-route: get-ingress
 	$(shell .scripts/route53.sh --delete '*.$(DNSZONE)' $(LOAD_BALANCER_IP))

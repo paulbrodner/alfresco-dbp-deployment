@@ -8,3 +8,7 @@
   $ make
  ```
  > (works on Unix, for Windows run this using CygWin)
+
+* run `$ make build` to create everithing in one go
+* run `$ make destroy` to delete everithing
+* run `$ make destroy DESIREDNAMESPACE=my-app` if you want to delete everithing in namespace "my-app"
