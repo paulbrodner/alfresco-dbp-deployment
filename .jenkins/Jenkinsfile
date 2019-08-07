@@ -14,7 +14,6 @@ pipeline {
     DESIREDNAMESPACE        = "${env.BUILD_NUMBER}-${BRANCH_NAME}"
     DNSZONE                 = "${DESIREDNAMESPACE}.dev.alfresco.me"
   }
-
   stages {
     stage('Deploy') {
       steps {

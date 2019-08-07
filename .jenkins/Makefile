@@ -88,12 +88,12 @@ get-ingress: get-dbp-deployment-name ## get load balancer IP
 	@echo The Ingress Load Balancer is found at: $(LOAD_BALANCER_IP)
 
 create-route: get-ingress
+	sleep 30
 	$(shell .scripts/route53.sh --create '*.$(DNSZONE)' $(LOAD_BALANCER_IP))
 
 delete-route: get-ingress
 	$(shell .scripts/route53.sh --delete '*.$(DNSZONE)' $(LOAD_BALANCER_IP))
 
-build: namespace deploy	## all in one - create
-	sleep 30 && make create-route
+build: namespace deploy	create-route ## all in one - create	
 	
 cleanup: delete-route destroy ## all in one - destroy
