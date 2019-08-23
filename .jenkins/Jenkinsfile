@@ -11,7 +11,7 @@ pipeline {
     AWS_ACCESS_KEY_ID       = credentials('dbp-user')
     AWS_SECRET_ACCESS_KEY   = credentials('dbp-user')    
     DESIREDNAMESPACE        = "${env.BRANCH_NAME}"
-    DNSZONE                 = "${DESIREDNAMESPACE}.dev.alfresco.me"
+    DNSZONE                 = "${DESIREDNAMESPACE}.tcds.dev.alfresco.me"
   }
 
   stages {
