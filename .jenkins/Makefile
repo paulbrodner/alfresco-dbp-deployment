@@ -50,9 +50,9 @@ namespace: ## 1 - create namespace for your cluster
 
 deploy: sed-values ## 2 - deploy	
 	# details https://github.com/helm/charts/tree/master/stable/nfs-server-provisioner
-	helm upgrade stable/nfs-server-provisioner --namespace $(DESIREDNAMESPACE) \
+	helm upgrade $(DESIREDNAMESPACE)-nfs-server stable/nfs-server-provisioner --install --namespace $(DESIREDNAMESPACE) \
 		--set persistence.enabled=true,persistence.size=21Gi,storageClass.name=$(DESIREDNAMESPACE)
-	helm upgrade alfresco-incubator/alfresco-dbp -f $(CHART_VALUES) \
+	helm upgrade $(DESIREDNAMESPACE)-alfresco-dbp alfresco-incubator/alfresco-dbp --install -f $(CHART_VALUES) \
 		--set alfresco-infrastructure.persistence.efs.enabled=false \
 		--set alfresco-infrastructure.persistence.storageClass.enabled=true \
 		--set alfresco-infrastructure.persistence.storageClass.name=$(DESIREDNAMESPACE) \
