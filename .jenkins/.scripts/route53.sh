@@ -75,4 +75,4 @@ elif [ "$DELETE" = "true" ]; then
   route_template 'DELETE' $@
 fi
 
-$(aws route53 change-resource-record-sets --hosted-zone-id Z15IEG419TWNPC --change-batch file://$dir/route-53.json) ||  exit 0;
+$(aws route53 change-resource-record-sets --hosted-zone-id Z15IEG419TWNPC --change-batch file://$dir/route-53.json) ||  echo "Route 53 exit!";

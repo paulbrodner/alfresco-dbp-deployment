@@ -40,4 +40,4 @@ get_deployments() {
     fi
 }
 
-get_deployments $1
+get_deployments $1 || echo "Check running pods!"

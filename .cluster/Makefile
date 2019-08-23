@@ -17,9 +17,20 @@ proxy: ## open k8s cluster
 	@kubectl proxy &
 	@echo Opening K8S Dashboard localy via proxy, click Skip on login page! 	
 	$(OPEN) http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/#!/overview?namespace=default
+	@make cluster-get-token
 
-
-.PHONY: get-token
-get-token: ## get token to login
-	$(eval SECRET_NAME := $(shell kubectl --namespace kube-system get secret | grep tiller-sa | awk '{print $$1}'))	
+.PHONY: cluster-get-token
+cluster-get-token: ## get token to login
+	$(eval SECRET_NAME := $(shell kubectl --namespace kube-system get secret | grep kubernetes-dashboard-token| awk '{print $$1}'))	
 	kubectl --namespace kube-system describe secret $(SECRET_NAME)
+
+cluster-available: ## show available clusters
+	@kubectl config get-contexts
+
+cluster-get-current: ## show current cluster context
+	@kubectl config current-context
+
+cluster-set-context: ## set current cluster context
+	make cluster-available
+	@read -p "Paste here the CLUSTER that you want to setup:" currentCluster && kubectl config use-context $$currentCluster
+	

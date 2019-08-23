@@ -50,19 +50,18 @@ namespace: ## 1 - create namespace for your cluster
 
 deploy: sed-values ## 2 - deploy	
 	# details https://github.com/helm/charts/tree/master/stable/nfs-server-provisioner
-	helm install stable/nfs-server-provisioner --namespace $(DESIREDNAMESPACE) \
+	helm upgrade stable/nfs-server-provisioner --namespace $(DESIREDNAMESPACE) \
 		--set persistence.enabled=true,persistence.size=21Gi,storageClass.name=$(DESIREDNAMESPACE)
-	helm install alfresco-incubator/alfresco-dbp -f $(CHART_VALUES) \
+	helm upgrade alfresco-incubator/alfresco-dbp -f $(CHART_VALUES) \
 		--set alfresco-infrastructure.persistence.efs.enabled=false \
 		--set alfresco-infrastructure.persistence.storageClass.enabled=true \
 		--set alfresco-infrastructure.persistence.storageClass.name=$(DESIREDNAMESPACE) \
 		--namespace=$(DESIREDNAMESPACE)
 	
 destroy: ## cleanup after deploy
-	helm delete --purge `helm ls --namespace=$(DESIREDNAMESPACE) | grep $(DESIREDNAMESPACE) | awk {'print $$1'}`	
-	kubectl delete --all pods  --namespace=$(DESIREDNAMESPACE) && \			
-	kubectl delete ns $(DESIREDNAMESPACE)	
-	# force delete of the namespace
+	helm delete --purge `helm ls --namespace=$(DESIREDNAMESPACE) | grep $(DESIREDNAMESPACE) | awk {'print $$1'}` && \
+	kubectl delete --all pods  --force --grace-period=0 --namespace=$(DESIREDNAMESPACE) && \
+	kubectl delete ns $(DESIREDNAMESPACE)
 	#kubectl get namespace $(DESIREDNAMESPACE) -o json |jq '.spec = {"finalizers":[]}' >temp.json
 	#curl -k -H "Content-Type: application/json" -X PUT --data-binary @temp.json 127.0.0.1:8001/api/v1/namespaces/$(DESIREDNAMESPACE)/finalize	
 	
